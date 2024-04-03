@@ -1,0 +1,19 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io("http://localhost:8080");
+
+  socket.on("connect", () => {
+    console.log(socket.id);
+    socket.emit("messageFromClient", {
+      data: "welcome from client to socket.io",
+    });
+  });
+
+  socket.on("messageFromServer", (data) => {
+    console.log(data);
+  });
+
+  socket.io.on("reconnect", () => {
+    console.log("reconnected");
+  });
+</script>

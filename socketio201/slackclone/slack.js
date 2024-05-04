@@ -17,3 +17,28 @@ io.on("connection", (socket) => {
   });
   socket.emit("nsList", namespaces);
 });
+
+namespaces.forEach((namespace) => {
+  io.of(namespace.endpoint).on("connection", (socket) => {
+    socket.on("joinRoom", async (roomToJoin, callback) => {
+      const rooms = socket.rooms;
+
+      let i = 0;
+      rooms.forEach((room) => {
+        if (i !== 0) {
+          socket.leave(room);
+        }
+        i++;
+      });
+
+      console.log(roomToJoin);
+      socket.join(roomToJoin);
+      const sockets = await io
+        .of(namespace.endpoint)
+        .in(roomToJoin)
+        .fetchSockets();
+      const socketCount = sockets.length;
+      callback({ numUsers: socketCount });
+    });
+  });
+});
